@@ -23,7 +23,7 @@ object RetailCSV {
     retailDF.printSchema()
 
     // 3- cast a column from integer to double (here i take quantity column which is cast into double)
-    retailDF = retailDF.withColumn("Quantity_In_Double", retailDF("Quantity").cast("double"))
+    retailDF = retailDF.withColumn("Quantity", col("Quantity").cast("double"))
     retailDF.show()
 
     // 4- add a new column which is sum of any 3 numeric columns
@@ -38,23 +38,24 @@ object RetailCSV {
     retailDF.explain(true)
 
     // 7-  print some sample rows
-    //retailDF.show(5)
+    retailDF.show(5)
 
     // 8 - move file from given location and again try println sample rows you will get error saying file not found
     //retailDF.show(5)
 
     // 9- move back file to crct place and cache above dataframe
-     retailDF.cache()  // call an action on a cached DataFrame, Spark will read the data from memory instead of from disk
-     retailDF.show(10)
+    // retailDF.cache()  // call an action on a cached DataFrame, Spark will read the data from memory instead of from disk
+    // retailDF.show(10)
+
 
     // 10- now perform action like count
       val rowCount = retailDF.count()
       println(s"Row count: $rowCount")   // 1811 output
 
-    // 11- move file from given location and again try println sample rows , error wont be thrown now because data is present in memeory
-     //retailDF.show(10)
+    // 11- move file from given location and again try println sample rows , error wont be thrown now because data is present in memory
+    //retailDF.show(10)
 
-    // 12- filter above rows for only 2013.
+   // 12- filter above rows for only 2013.
     val retail2013 = retailDF
       .withColumn("Quantity_In_Double", retailDF("Quantity").cast("double"))
       .withColumn("sumOfThreeColumns", expr("Quantity + Discount + Shipping_Cost"))
@@ -63,12 +64,12 @@ object RetailCSV {
     retail2013.show(3)
 
     // 13- print sum of sales for each ship mode on dataframe
-    val sumByShipModeDF = retailDF.groupBy("Ship_Mode")
+    val sumByShipModeDF = retail2013.groupBy("Ship_Mode")
       .agg(sum("Sales").as("Total_Sales"))
     sumByShipModeDF.show()
 
     // 14- print sum of sales and discount for each ship mode and category (aggregations => sum sales, sum discount, groupBy => ship mode and category)
-    val salesDiscountDF = retailDF.groupBy("Ship_Mode", "Category")
+    val salesDiscountDF = retail2013.groupBy("Ship_Mode", "Category")
       .agg(sum("Sales").as("Total Sales"),
         sum("Discount").as("Total Discount"))
     salesDiscountDF.show()
