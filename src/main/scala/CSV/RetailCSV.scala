@@ -56,14 +56,10 @@ object RetailCSV {
     //retailDF.show(10)
 
    // 12- filter above rows for only 2013.
-    val retail2013 = retailDF
-      .withColumn("Quantity_In_Double", retailDF("Quantity").cast("double"))
-      .withColumn("sumOfThreeColumns", expr("Quantity + Discount + Shipping_Cost"))
-      .drop("Market")
-      .filter(year($"Order_Date") === 2013)
+    val retail2013 = retailDF.filter(year($"Order_Date") === 2013)
     retail2013.show(3)
 
-    // 13- print sum of sales for each ship mode on dataframe
+   // 13- print sum of sales for each ship mode on dataframe
     val sumByShipModeDF = retail2013.groupBy("Ship_Mode")
       .agg(sum("Sales").as("Total_Sales"))
     sumByShipModeDF.show()
